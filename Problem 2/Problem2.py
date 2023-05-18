@@ -71,9 +71,8 @@ for t in enumerate(tau):
     #print(t[0]) <- for testing
     ne[t[0]] = t[1]/(sigmat*rout) #Electron density // Assuming bremsstrahlung at max radius - needs clarification // seems like a random number, but I think its correct?
     for freq in enumerate(v):
-        Brems[freq[0]] = 6.8 * 10**-38 * Z**2 * ne[0]**2 * Tcor**-0.5 * gff * np.exp(-(h*10**freq[1])/(k*Tcor)) 
+        Brems[freq[0]] = 6.8 * 10**-38 * Z**2 * ne[t[0]]**2 * Tcor**-0.5 * gff * np.exp(-(h*10**freq[1])/(k*Tcor)) 
     FinalFlux = F + Brems * 4/3 * np.pi * rout**3 
-    plt.figure(t[0])
     plt.scatter(v, np.log10(FinalFlux), s=1)
     
 
