@@ -69,7 +69,7 @@ Brems = np.zeros(v.shape)
 ne = np.zeros(tau.shape)
 for t in enumerate(tau):
     #print(t[0]) <- for testing
-    ne[t[0]] = t[1]/(sigmat*rout) #Electron density // Assuming bremsstrahlung at max radius - needs clarification // seems like a random number, but I think its correct?
+    ne[t[0]] = t[1]/(sigmat*rout) #Electron density // Bremsstrahlung assumed at Rout - confirmed to be fine
     for freq in enumerate(v):
         Brems[freq[0]] = 6.8 * 10**-38 * Z**2 * ne[t[0]]**2 * Tcor**-0.5 * gff * np.exp(-(h*10**freq[1])/(k*Tcor)) 
     FinalFlux = F + Brems * 4/3 * np.pi * rout**3 
