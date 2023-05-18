@@ -47,10 +47,10 @@ def bbr(r, v):
 
 
 
-F = np.zeros(v.shape)
+Flux = np.zeros(v.shape)
 for freq in enumerate(v):
     throwaway = quad(bbr, rin, rout, args=(10**freq[1]))
-    F[freq[0]] = throwaway[0]
+    Flux[freq[0]] = throwaway[0]
 
     #print(F[freq[0]]) <- testing lol
 
@@ -72,7 +72,7 @@ for t in enumerate(tau):
     ne[t[0]] = t[1]/(sigmat*rout) #Electron density // Bremsstrahlung assumed at Rout - confirmed to be fine
     for freq in enumerate(v):
         Brems[freq[0]] = 6.8 * 10**-38 * Z**2 * ne[t[0]]**2 * Tcor**-0.5 * gff * np.exp(-(h*10**freq[1])/(k*Tcor)) 
-    FinalFlux = F + Brems * 4/3 * np.pi * rout**3 
+    FinalFlux = Flux + Brems * 4/3 * np.pi * rout**3 
     plt.scatter(v, np.log10(FinalFlux), s=1)
     
 
@@ -81,11 +81,28 @@ for t in enumerate(tau):
 
 '''
 
-To do list:
-1) Introducte Compton scattering
+Oh God, help
 
 '''
 
+
+#Compton scattering
+#Assuming corona is electron based, cause why not
+#Constants/give
+me = 9.1094*10**-28 #g
+#Electron velocity
+vel = np.arange(9, 12, 0.001, dtype=float) #logarithmic scale to determine the appropriate boundaries before I start integrating // Will probably change to normal scale, maybe, I dunno
+
+def maxwell(y): #Maxwell distribution
+    return (me/(2*np.pi*k*Tcor))**1.5 * 4 * np.pi * y**2 * np.exp(-(me * y**2)/(2*k*Tcor))
+
+f = np.zeros(vel.shape)
+for y in enumerate(vel):
+    f[y[0]] = maxwell(10**y[1])
+
+
+plt.figure("Maxwell")
+plt.scatter(vel, f, s=1)
 
 
 plt.show()
