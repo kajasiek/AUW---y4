@@ -1,4 +1,4 @@
-# AUW---y4
+
 Astronomy UW - solutions to problems, year 4 - Python
 
 
