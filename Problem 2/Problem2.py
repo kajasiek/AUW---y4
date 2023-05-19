@@ -87,14 +87,14 @@ Oh God, help
 
 
 #Compton scattering
-#Assuming corona is electron based, cause why not
+#Assuming corona is electron based, cause why not <- well this was wrong lol; changed to hydrogen gas
 #Constants/give
-me = 9.1094*10**-28 #g
+#me = 9.1094*10**-28 #g <- no longer needed
 #Electron velocity
-vel = np.arange(9, 12, 0.001, dtype=float) #logarithmic scale to determine the appropriate boundaries before I start integrating // Will probably change to normal scale, maybe, I dunno
+vel = np.arange(7.5, 9.35, 0.001, dtype=float) #logarithmic scale to determine the appropriate boundaries before I start integrating // Will probably change to normal scale, maybe, I dunno
 
 def maxwell(y): #Maxwell distribution
-    return (me/(2*np.pi*k*Tcor))**1.5 * 4 * np.pi * y**2 * np.exp(-(me * y**2)/(2*k*Tcor))
+    return (mp/(2*np.pi*k*Tcor))**1.5 * 4 * np.pi * y**2 * np.exp(-(mp * y**2)/(2*k*Tcor))
 
 f = np.zeros(vel.shape)
 for y in enumerate(vel):
