@@ -47,10 +47,10 @@ def bbr(r, v):
 
 
 
-Flux = np.zeros(v.shape)
+Lum = np.zeros(v.shape)
 for freq in enumerate(v):
     throwaway = quad(bbr, rin, rout, args=(10**freq[1]))
-    Flux[freq[0]] = throwaway[0]
+    Lum[freq[0]] = throwaway[0]
 
     #print(F[freq[0]]) <- testing lol
 
@@ -72,7 +72,7 @@ for t in enumerate(tau):
     ne[t[0]] = t[1]/(sigmat*rout) #Electron density // Bremsstrahlung assumed at Rout - confirmed to be fine
     for freq in enumerate(v):
         Brems[freq[0]] = 6.8 * 10**-38 * Z**2 * ne[t[0]]**2 * Tcor**-0.5 * gff * np.exp(-(h*10**freq[1])/(k*Tcor)) 
-    FinalFlux = Flux + Brems * 4/3 * np.pi * rout**3 
+    FinalFlux = Lum + Brems * 4/3 * np.pi * rout**3 
     plt.scatter(v, np.log10(FinalFlux), s=1)
     
 
@@ -87,22 +87,60 @@ Oh God, help
 
 
 #Compton scattering
-#Assuming corona is electron based, cause why not <- well this was wrong lol; changed to hydrogen gas
-#Constants/give
-#me = 9.1094*10**-28 #g <- no longer needed
+#Assuming corona is electron based, cause why not
+#Constants/given
+me = 9.1094*10**-28 #g <- no longer needed
 #Electron velocity
-vel = np.arange(7.5, 9.35, 0.001, dtype=float) #logarithmic scale to determine the appropriate boundaries before I start integrating // Will probably change to normal scale, maybe, I dunno
+# I dont think this is needed anymore // gamma = np.arange(1, 3, 0.0001, dtype=float)
 
 def maxwell(y): #Maxwell distribution
-    return (mp/(2*np.pi*k*Tcor))**1.5 * 4 * np.pi * y**2 * np.exp(-(mp * y**2)/(2*k*Tcor))
+    return 4*np.pi*c**3 * (me/(2*np.pi*k*Tcor))**1.5 * np.sqrt(1 - 1/y**2) * 1/y**3 * np.exp(-(y*me*c**2)/(k*Tcor))
 
-f = np.zeros(vel.shape)
-for y in enumerate(vel):
-    f[y[0]] = maxwell(10**y[1])
+#f = np.zeros(gamma.shape)
+#for y in enumerate(gamma):
+#    f[y[0]] = maxwell(y[1]) #not used rn, will figure it out on the weekend (hopefully)
 
 
-plt.figure("Maxwell")
-plt.scatter(vel, f, s=1)
+
+
+
+#Defining quad functions here
+def photflux(number): #returns flux at Rout
+    return Lum[number]/(4*np.pi*rout**2) 
+
+def nphot(en, number): #returns number of photons of given energy (v) at given distance (I assumed rout)
+    return photflux(number)/(h*en) * 1/c 
+
+def electdist(): #//////////////////////// TESTING PURPOSES <- ALL ELECTRONS HAVE CONSTANT ENERGY EQUAL TO THE THERMAL ENERGY // Will change later to Maxwell distribution defined above
+    return k*Tcor
+
+def x(en, en1, y): #definition of x in Fc(x) - lecture
+    return en1/(4*y**2 * en) 
+
+def Fc(en, en1, y): #Fc(x) in gamma integral
+    return 1 + x(en, en1, y) - 2*x(en, en1, y)**2 + 2*x(en, en1, y)*np.log(x(en, en1, y))
+
+
+#Quads themselves
+def quadoverv(en, en1, number): #frequency/energy integral
+    throwawaygamma = quad(quadovergamma, 1, 3, args=(en,en1))
+    return nphot(en, number)/en * throwawaygamma[0]
+
+def quadovergamma(y, en, en1): #gamma integral
+    return Fc(en, en1, y) * electdist()/y**2
+
+
+v1 = np.arange(18, 25, 0.01, dtype=float) #epsilon1 from lecture for those interested // REALLY IMPORTANT - v.shape and v1.shape must be the same <- otherwise will fail quite badly // 
+#no clue how to fix right now, maybe someone else can?
+
+emissivity = np.zeros(v1.shape) #This is what we wanna end up with
+for freq in enumerate(v1):
+    throwawayv = quad(quadoverv, 10**15, 10**22, args=(10**freq[1], freq[0]))
+    emissivity[freq[0]] = throwawayv[0]
+
+plt.figure("Emissivity")
+plt.scatter(v1, np.log10(emissivity), s=1)
+
 
 
 plt.show()
