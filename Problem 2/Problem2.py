@@ -8,11 +8,25 @@ from scipy.integrate import quad
 
 PROGRAM IS DONE
 
-Only one thing left to add, but waiting for confirmation.
-
 Everything should be working just fine, no problems whatsoever.
 
 Some values can be changed, will mark them by commenting I guess.
+
+'''
+
+
+
+
+
+'''
+
+WARNING
+
+This program runs for really long. And I mean it (probably up to 10-20min for slower PCs/laptops - havent tested it yet). It is due to double integral that are both in 2 loops.
+To reduce the runtime you can change values in v and v1 (defined below in appropriate places).
+Be aware - it might change the end result.
+
+END OF WARNING
 
 '''
 
@@ -30,10 +44,9 @@ eta = 0.01 #accretion efficiency
 h = 6.6261 * 10**-27 #cgs <- normal PC
 hred = 1.0546 * 10**-27 #cgs <- reduced PC
 k = 1.3087 * 10**-16 #cgs
-#Eddington shit <- accretion rate, might be useful later lol
+#Eddington stuff <- accretion rate, might be useful later lol
 Ledd = (4 * np.pi * G * MBH * mp * c)/sigmat
 Maccedd = Ledd/(eta * c**2)
-const = ((G * MBH)/(8 * np.pi * sigmab) * Maccedd)**0.25 #testing purposes
 #Frequency
 v = np.arange(3,22,0.1,dtype=float) #this is in logarithmic, remember to convert lol
 #leave dtype - required, otherwise overflows
@@ -41,9 +54,8 @@ v = np.arange(3,22,0.1,dtype=float) #this is in logarithmic, remember to convert
 #IMPORTANT - v.shape and v1.shape (below) need to be the same - cant be bothered to fix
 
 '''
-Here starts endless pain and suffering, change my mind
+///////////////////////////////////////////////////////// MAIN PART ////////////////////////////////////////////////////
 '''
-
 
 def Temp(r): #Defining temperature at a given distance
     const = ((G * MBH)/(8 * np.pi * sigmab) * Maccedd)**0.25
@@ -95,12 +107,12 @@ for t in enumerate(tau):
 
 
 
-'''
-Oh God, help
-'''
+
 
 
 #Compton scattering
+
+
 #Assuming corona is electron based, cause why not - confirmed
 #Constants/given
 me = 9.1094*10**-28 #g
@@ -113,8 +125,7 @@ def nphot(en, number): #returns number of photons of given energy (v) at given d
     return photflux(number)/(h*en) * 1/c 
 
 def electdist(y): #Electron energy distribution
-    #return k * Tcor <- This for testing
-    return 4*np.pi*c**3 * (me/(2*np.pi*k*Tcor))**1.5 * np.sqrt(1 - 1/y**2) * 1/y**3 * np.exp(-(y*me*c**2)/(k*Tcor)) #This function is fine. Derived this manually, so no mistake (hopefully - tbf emissivity looks just fine, so)
+    return 4*np.pi*c**3 * (me/(2*np.pi*k*Tcor))**1.5 * np.sqrt(1 - 1/y**2) * 1/y**3 * np.exp(-(y*me*c**2)/(k*Tcor)) #This function is fine. Derived this manually, so no mistakes
 
 def x(en, en1, y): #definition of x in Fc(x) - lecture
     return en1/(4*y**2 * en) 
@@ -136,27 +147,26 @@ def quadovergamma(y, en, en1): #gamma integral
 
 
 v1 = np.arange(8, 27, 0.1, dtype=float) #epsilon1 from lecture for those interested // REALLY IMPORTANT - v.shape and v1.shape must be the same <- otherwise will fail quite badly // 
-#no clue how to fix right now, maybe someone else can? 
+#if someone wants to fix it, have fun // Values can be changed, just remember about shapes
 
-#Values in v1 and v can be changed to whatever, but remember to leave the v.shape and v1.shape the same - unless you figure out how to fix it - I cant be bothered
 
 #Compton scattering - spectrum
+
 emissivity = np.zeros(v1.shape) #This is what we wanna end up with
-for freq in enumerate(v1):
-    throwawayv = quad(quadoverv, 10**3, 10**22, args=(10**freq[1], freq[0]))
-    emissivity[freq[0]] = throwawayv[0] * (3 * c * sigmat * 10**freq[1])/(16*np.pi) 
+for electron in enumerate(ne): #Yes, another loop, cause every optical depth results in sth else
+    for freq in enumerate(v1):
+        throwawayv = quad(quadoverv, 10**3, 10**22, args=(10**freq[1], freq[0]))
+        emissivity[freq[0]] = throwawayv[0] * (3 * c * sigmat * 10**freq[1])/(16*np.pi) * electron[1] * h * 4/3 * np.pi * rout**3 #constants after throwaway are constants, dont question them // if you dont know where they came from
+                                                                                                                                  #I suggest deriving everyhing yourself
+    plt.scatter(v1, np.log10(emissivity), s=1) #plotting emissivity
 
-
-
-plt.scatter(v1, np.log10(emissivity), s=1)
 
 '''
-To do list
-
-1. Somehow convert emissivity to luminosity. Needs confirmation tho, so gonna wait
-
-Otherwise everything else is just fine
+END OF PROGRAM
 '''
+
+
+
 
 
 plt.show()
