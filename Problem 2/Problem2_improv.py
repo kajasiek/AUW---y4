@@ -7,6 +7,12 @@ import warnings
 #But to make it look nice, all will be suppressed
 warnings.filterwarnings("ignore")
 
+
+'''
+
+This program was remade by someone else. I do not take any responsibility for this
+
+'''
 '''
 Improvement of original
 '''
