@@ -22,12 +22,21 @@ Some values can be changed, will mark them by commenting I guess.
 
 WARNING
 
-This program runs for really long. And I mean it (probably up to 10-20min for slower PCs/laptops - havent tested it yet). It is due to double integral that are both in 2 loops.
+This program runs for really long. And I mean it (tested on limited values - 8 minutes). It is due to double integral that are both in 2 loops.
 To reduce the runtime you can change values in v and v1 (defined below in appropriate places).
 Be aware - it might change the end result.
 
 END OF WARNING
 
+'''
+
+'''
+WARNING 2
+
+If you decide to add numba module to this program, DO NOT ADD @jit or any other command from it to the electron distribution function in the
+third part - as it will break the function and it will result in false values being returned.
+
+END OF WARNING
 '''
 
 #Constants/Given
@@ -54,7 +63,11 @@ v = np.arange(3,22,0.1,dtype=float) #this is in logarithmic, remember to convert
 #IMPORTANT - v.shape and v1.shape (below) need to be the same - cant be bothered to fix
 
 '''
-///////////////////////////////////////////////////////// MAIN PART ////////////////////////////////////////////////////
+///////////////////////////////////////////////////////// MAIN PROGRAM ////////////////////////////////////////////////////
+'''
+
+'''
+PART 1
 '''
 
 def Temp(r): #Defining temperature at a given distance
@@ -79,7 +92,9 @@ for freq in enumerate(v): #Calculating luminosity - normal spectrum from the dis
 
 
 
-
+'''
+PART 2
+'''
 
 
 #Spectrum time - bremsstrahlung
@@ -108,7 +123,9 @@ for t in enumerate(tau):
 
 
 
-
+'''
+PART 3
+'''
 
 #Compton scattering
 
