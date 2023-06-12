@@ -16,7 +16,7 @@ Coordinates for the letter must be set manually for now - maybe I will fix it at
 
 WARNING 2
 
-Cross section/impact parameter/whateveryoucall it has a minimal value of 1.5 - otherwise it will be under the photon sphere and the photon will be just invisible
+Cross section/impact parameter/whateveryoucallit has a minimal value of 1.5 - otherwise it will be under the photon sphere and the photon will be just invisible
 
 '''
 
