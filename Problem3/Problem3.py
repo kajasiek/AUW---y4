@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from numba import jit
+from scipy.integrate import quad
 
 #Solution to problem 3
 
@@ -16,31 +17,35 @@ Coordinates for the letter must be set manually for now - maybe I will fix it at
 
 WARNING 2
 
-Cross section/impact parameter/whateveryoucallit has a minimal value of 1.5 - otherwise it will be under the photon sphere and the photon will be just invisible
+Cross section/impact parameter/whateveryoucall it has a minimal value of 3*sqrt(3) - otherwise it will be under the photon sphere and the photon will be just invisible
 
 '''
 
 #constants
+'''
 Msun = 2 * 10**30 #kg
 M = 1 * Msun #kg - number can be changed to whatever
-c = 3e5 #km/s
+c = 3e5 #km/s                                                     Is this even needed? Think not
 G = 6.67e-20 #km^3/kg/s^2
 r_s = 2 * G * M/c**2 #in km
-
+'''
+bmin = 3*np.sqrt(3) #minimal impact parameter
+distance_obs = 200 #distance to observer
+distance_scr = 20
 
 #Creating the image
 def screen_base():
-    rad = 2 * r_s
+    rad = 2
     theta = np.linspace(0, 2*np.pi, 1000)
     plt.figure("Base screen")
 
     #Plotting a circle, wow
     x = rad * np.cos(theta)
     y = rad * np.sin(theta)
-    plt.plot(x,y)
+    plt.plot(x,y) #Assuming its circular, cause why not?
 
     #Coordinates - YOU NEED TO MANUALLY FIND THOSE COORDINATES FOR THE LETTER <- maybe will fix later, who knows?
-    rad_j = [0.75*r_s, 0.75*r_s, np.sqrt(1.125)*r_s, np.sqrt(1.125)*r_s, np.sqrt(1.125)*r_s, np.sqrt(1.125)*r_s, 1.5*r_s]
+    rad_j = [0.75, 0.75, np.sqrt(1.125), np.sqrt(1.125), np.sqrt(1.125), np.sqrt(1.125), 1.5]
     theta_j = [0, np.pi/2, np.pi/4, 7*np.pi/4, 5*np.pi/4, 3*np.pi/4, 1.5*np.pi]
 
     #Plotting the letter
@@ -51,7 +56,7 @@ def screen_base():
 
 
 def black_hole():
-    photon_sphere = 1.5 * r_s 
+    photon_sphere = 1.5
     theta = np.linspace(0, 2*np.pi, 1000)
     fig, ax = plt.subplots()
     ax.set_title("Black hole and photon sphere")
@@ -64,22 +69,36 @@ def black_hole():
     plt.plot(x_phot_sph, y_phot_sph, c="black")
 
     #Plotting the black hole
-    x_bh = r_s * np.cos(theta) 
-    y_bh = r_s * np.sin(theta)
+    x_bh =  np.cos(theta) 
+    y_bh =  np.sin(theta)
     ax.fill(x_bh, y_bh, "black")
 
 
-def deviation():
+def angle_deviation(): #angle range - the final angle needs to be in this range, otherwise the photon will miss the screen
     dev = [np.pi - np.arctan(0.1), np.pi + np.arctan(0.1)]
     return dev
 
-def angular_change(b): #b = [Schwarzschild radius]
-    ang = 2 * r_s * 1/b
-    return ang
+def x_to_radius(x,b):
+    return np.sqrt(b**2 + x**2)
 
 screen_base()
 black_hole()
-print(deviation())
-print(1.85, 20*r_s*np.tan(angular_change(1.85)), angular_change(1.85))
-print(1.95, 20*r_s*np.tan(angular_change(1.95)))
+
+plt.figure()
+plt.xlim(left=-20,right=100)
+plt.xlabel("Distance from black hole - projection on x axis [in Schwarzschild radius]")
+plt.ylabel("Distance from black hole - projection on y axis [in Schwarzschild radius]")
+def integral(x,b):
+    top = x 
+    bot = (b**2 + x**2)**1.5 * np.sqrt(1/b**2 - (1 - 1/np.sqrt(b**2 + x**2))*1/(b**2 + x**2))
+    y = x_to_radius(x,b) * np.sin(top/bot)
+    plt.scatter(x, y, c='r', s=2)
+    return top/bot
+
+b = 10
+throwawayangle = quad(integral, distance_obs, -distance_scr, args=(b)) 
+angle = throwawayangle[0]
+print(angle)
+
+
 plt.show()
