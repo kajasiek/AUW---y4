@@ -73,7 +73,7 @@ def deviation():
     dev = [np.pi - np.arctan(0.1), np.pi + np.arctan(0.1)]
     return dev
 
-def angular_change(b):
+def angular_change(b): #b = [Schwarzschild radius]
     ang = 2 * r_s * 1/b
     return ang
 
