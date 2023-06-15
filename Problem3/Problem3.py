@@ -32,7 +32,6 @@ r_s = 2 * G * M/c**2 #in km
 bmin = 3*np.sqrt(3) #minimal impact parameter
 distance_obs = 200 #distance to observer
 distance_scr = 20
-
 #Creating the image
 def screen_base():
     rad = 2
@@ -60,8 +59,8 @@ def black_hole():
     theta = np.linspace(0, 2*np.pi, 1000)
     fig, ax = plt.subplots()
     ax.set_title("Black hole and photon sphere")
-    ax.set_xlim(-10, 10)
-    ax.set_ylim(-10, 10)
+    ax.set_xlim(-50, 50)
+    ax.set_ylim(-50, 50)
     ax.set_aspect("equal")
     #Plotting the photon sphere
     x_phot_sph = photon_sphere * np.cos(theta)
@@ -78,27 +77,37 @@ def angle_deviation(): #angle range - the final angle needs to be in this range,
     dev = [np.pi - np.arctan(0.1), np.pi + np.arctan(0.1)]
     return dev
 
-def x_to_radius(x,b):
-    return np.sqrt(b**2 + x**2)
 
 screen_base()
 black_hole()
 
-plt.figure()
-plt.xlim(left=-20,right=100)
-plt.xlabel("Distance from black hole - projection on x axis [in Schwarzschild radius]")
-plt.ylabel("Distance from black hole - projection on y axis [in Schwarzschild radius]")
-def integral(x,b):
-    top = x 
-    bot = (b**2 + x**2)**1.5 * np.sqrt(1/b**2 - (1 - 1/np.sqrt(b**2 + x**2))*1/(b**2 + x**2))
-    y = x_to_radius(x,b) * np.sin(top/bot)
-    plt.scatter(x, y, c='r', s=2)
-    return top/bot
 
-b = 10
-throwawayangle = quad(integral, distance_obs, -distance_scr, args=(b)) 
-angle = throwawayangle[0]
-print(angle)
+def rmin_to_b(r):
+    return r * np.sqrt(r/(r-1))
+
+
+def dphi(dr,r,b):
+    return dr/(r**2 * np.sqrt(1/b**2 - (1 - 1/r) * 1/r**2))
+
+rmin = 5 #in r_s
+N = 10000 #number of steps
+dr = (distance_obs - rmin)/N  
+r = np.zeros(N)
+phi = np.zeros(N)
+phi[0] = 0
+r[0] = rmin 
+b = rmin_to_b(rmin)
+for i in range(N-1): 
+    r[i+1] = r[i] + dr
+    phi[i+1] = phi[i] + dphi(dr, r[i+1], b)
+    x = r[i] * np.cos(phi[i])
+    y = r[i] * np.sin(phi[i]) 
+    plt.scatter(x, y, c='r',s=2)
+
+
+
+
+
 
 
 plt.show()
