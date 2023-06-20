@@ -13,6 +13,12 @@ Introduction to Modern Dynamics - Chaos, Networks, Space and Time
 Oxford University Press (2015)
 '''
 
+'''
+
+This code is based on someone else's work
+I have not tested it and I do not know how it works
+
+'''
 
 #constants
 RS = 1          #Schwarzschild radius
