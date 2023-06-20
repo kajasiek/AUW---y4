@@ -276,18 +276,18 @@ def main():
     hitletterekran = np.array(hitletterekran)
     #print(hitletter[:,0])
     #Disturbed letter with edge hitting photons in blue
-    plt.figure(3)
+    plt.figure(3,figsize=(8,8))
     plt.scatter(hitletter[:,0]*np.cos(hitletter[:,1]),
                 hitletter[:,0]*np.sin(hitletter[:,1]),s=4,c='k')
     plt.scatter(ekranhit[:,0]*np.cos(ekranhit[:,1]),
                 ekranhit[:,0]*np.sin(ekranhit[:,1]),s=0.1,c='b')
-    plt.xlim([-6,6])
-    plt.ylim([-6,6])
-    plt.title('Letter and screen edge as seen by observer')
+    plt.xlim([-10,10])
+    plt.ylim([-10,10])
+    plt.title(f'Letter and screen edge as seen by observer (at {d_obs=})')
     plt.xlabel('x [RS]')
     plt.ylabel('y [RS]')
     #Letter as "seen" by the projected rays
-    plt.figure(4)
+    plt.figure(4,figsize=(8,8))
     plt.scatter(hitletterekran[:,0]*np.cos(hitletterekran[:,1]),
                 hitletterekran[:,0]*np.sin(hitletterekran[:,1]),
                 s=4,c='k')
