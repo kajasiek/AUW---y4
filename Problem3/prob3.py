@@ -20,11 +20,13 @@ I have not tested it and I do not know how it works
 
 '''
 
+'''Stop writing in my code'''
+
 #constants
 RS = 1          #Schwarzschild radius
 R_ekran = 2*RS     #
 d_ekran = 20*RS    #
-d_obs = 0*RS
+d_obs = 500*RS
 nFlag = 0       #near flag (particle is within d_ekran)
 fFlag = 0       #far flag (particle has left d_ekran radius)
 thetas = np.linspace(0,2*np.pi,1000) #angles
@@ -172,14 +174,14 @@ def main():
 #loop for several starting points
 #Loops: For different observator distances: 500,50,0
     #loop hit lists:
-    #loop0 = np.linspace(6.958,8.5294,200)
+    loop0 = np.linspace(6.958,8.5294,200)
     #loop0 = np.linspace(6.825,8.362,200)
-    loop0 = np.linspace(4.0004,5.5395,200)
+    #loop0 = np.linspace(4.0004,5.5395,200)
     print(loop0[1]-loop0[0])
 #Loops: For different observator distances: 500,50,0
-    #loop1 = np.linspace(3.720735,3.7208456,200)
+    loop1 = np.linspace(3.720735,3.7208456,200)
     #loop1 = np.linspace(3.6538205,3.6539293,200)
-    loop1 = np.linspace(1.50003095,1.50004367,200)
+    #loop1 = np.linspace(1.50003095,1.50004367,200)
     print(loop1[1]-loop1[0])
     #Second loop trajectories are dismissed due to rounding error
     #loop2 = np.linspace(3.7203734711,3.7203734951,100)
