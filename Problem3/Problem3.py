@@ -74,12 +74,14 @@ Center of the coordinate system is in the center of the black hole
 distance_obs = 200 #distance to observer - can be changed, but no need
 distance_scr = 20 #distance to screen
 
+
 #Creating the image
 @jit
 def screen_base():
     rad = 2
     theta = np.linspace(0, 2*np.pi, 1000)
     plt.figure("Base screen")
+    
 
     #Plotting a circle, wow
     x = rad * np.cos(theta)
@@ -87,14 +89,44 @@ def screen_base():
     plt.plot(x,y) #Assuming its circular, cause why not?
 
     #Coordinates - YOU NEED TO MANUALLY FIND THOSE COORDINATES FOR THE LETTER <- unfixable afaik
-    rad_j = [0.75, 0.75, np.sqrt(1.125), np.sqrt(1.125), np.sqrt(1.125), np.sqrt(1.125), 1.5]
-    theta_j = [0, np.pi/2, np.pi/4, 7*np.pi/4, 5*np.pi/4, 3*np.pi/4, 1.5*np.pi]
+    #Coordinates: x: (-1 <-> 1); y: (-1 <-> 1 + kolko)
+    y_move = 0.5
+
+    #Step 1 - top line
+    x_top = np.arange(-1,1,0.1)
+    y_top = np.zeros(x_top.shape)
+    for i,j in enumerate(x_top):
+        y_top[i] = 1
+    
+    #Step 2 - side line
+    y_side = np.arange(-1,1.01,0.1)
+    x_side = np.zeros(y_side.shape)
+    for i,j in enumerate(y_side):
+        x_side[i] = 1
+
+    #Step 3 - bottom half
+    x_center = 0
+    y_center = -1
+    rad_bottom = 1
+    theta_bottom = np.linspace(np.pi, 2*np.pi, 20)
+    x_bottom = x_center + rad_bottom * np.cos(theta_bottom)
+    y_bottom = y_center + rad_bottom * np.sin(theta_bottom)
+
+    #Moving
+    y_top += y_move 
+    y_side += y_move 
+    y_bottom += y_move
 
     #Plotting the letter
-    x_j = rad_j * np.cos(theta_j)
-    y_j = rad_j * np.sin(theta_j)
+    plt.scatter(x_top, y_top, c="gray", s=4)
+    plt.scatter(x_side, y_side, c="gray", s=4)
+    plt.scatter(x_bottom, y_bottom, c="gray", s=4)
 
-    plt.scatter(x_j, y_j, c="gray", s=4)
+    r_top = np.sqrt(x_top**2 + y_top**2)
+    r_side = np.sqrt(x_side**2 + y_side**2)
+    r_bot = np.sqrt(x_bottom**2 + y_bottom**2)
+
+    return r_top, r_side, r_bot
 
 @jit
 def black_hole(): #Function to plot the black hole and a photon sphere around it
@@ -118,7 +150,7 @@ def black_hole(): #Function to plot the black hole and a photon sphere around it
 
 
 
-screen_base() #Plotting the screen
+r_top, r_side, r_bot = screen_base() #Plotting the screen
 black_hole() #Plotting the black hole
 
 
@@ -144,10 +176,11 @@ def dphi(dr,r,b): #Integrand
 def deflection(phi): #Rotation
     return phi - np.pi/2
 
-rmin = np.arange(5, 5.01, 0.1) #Parameter fitting must be done manually to determine \\
+rmin = np.arange(5.5, 7.01, 0.01) #Parameter fitting must be done manually to determine \\
                                 #if the photon hits the screen - if I remember, I will add \\
                                 #the correct set of parameters to the beginning of the program
 
+print(rmin.shape)
 N = 1000000 #number of steps - this can reduced/increased to reduce/increase precision \\
             #This must be a high enough number to actually see the photon curve around a black hole 
             #1e6 is enough to see one loop - higher numbers may result in more loops \\
@@ -171,7 +204,10 @@ but 200 works just fine
 
 '''
 
-
+f = open("wyniki.txt", "w")
+f.write(np.array2string(r_top) + "\n")
+f.write(np.array2string(r_side) + "\n")
+f.write(np.array2string(r_bot) + "\n")
 for j, rstart in enumerate(rmin):
     #Constants/initial position
     r = np.zeros(N) 
@@ -227,8 +263,11 @@ for j, rstart in enumerate(rmin):
     #Simple loop to determine where the photon hit the screen
     print("Loop number", j)
     for i in range(N-1):
-        if(np.abs(y[i]) - 20 < e and np.abs(y[i]) - 20 > 0):
-            print(y[i], x[i])
+        if(np.abs(y[i]) - 20 < e and np.abs(y[i]) - 20 > 0 and np.abs(x[i]) < 2):
+            #print(y[i], x[i])
+            f.write(f'{j} {y[i]} {x[i]}\n')
+        elif(np.abs(y[i]) - 20 < e and np.abs(y[i]) - 20 > 0 and np.abs(x[i]) > 2):
+            print("Photon failed to hit the screen")
 
     '''
 
@@ -244,7 +283,7 @@ for j, rstart in enumerate(rmin):
 
 
 
-
+f.close()
 
 
 
